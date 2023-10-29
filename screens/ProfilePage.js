@@ -9,17 +9,21 @@ import {
   Image,
   TextInput,
   KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  Appearance,
 } from 'react-native';
 import colors from '../data/theme';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 const {width, height} = Dimensions.get('window');
 import styles from '../data/styles';
+const mode = Appearance.getColorScheme();
 
 function ProfilePage({setText, text, setPhotoState, photoState}) {
   const handleTextChange = text => {
     setText(text);
-    console.log(photoState);
+    // console.log(photoState);
   };
 
   async function handleChangePress() {
@@ -33,6 +37,7 @@ function ProfilePage({setText, text, setPhotoState, photoState}) {
   const hasPhoto = typeof photoState.uri != 'undefined';
 
   const buttonStyle = hasPhoto ? styles.changePhoto : styles.addPhoto;
+  const inputStyle = hasPhoto ? styles.input : styles.inputEmpty;
   function Photo(props) {
     if (hasPhoto) {
       return (
@@ -52,10 +57,13 @@ function ProfilePage({setText, text, setPhotoState, photoState}) {
       return <View style={styles.photoEmptyView} />;
     }
   }
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
   return (
-    // <KeyboardAvoidingView>
-    <SafeAreaView style={[styles.profileContainer]}>
-      <View style={{padding: 10}}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={keyboardVerticalOffset}
+      style={styles.profileContainer}>
+      <ScrollView>
         <View>
           <Text style={styles.heading}>Edit Profile</Text>
           <Text style={styles.subHeading}>Mirror, Mirror On The Wall...</Text>
@@ -65,18 +73,20 @@ function ProfilePage({setText, text, setPhotoState, photoState}) {
           <View style={buttonStyle}>
             <Button
               onPress={handleChangePress}
+              color={colors[mode].bgColor}
               title={hasPhoto ? 'Change Photo' : 'Add Photo'}
             />
           </View>
         </View>
+
         <TextInput
-          style={styles.input}
+          style={inputStyle}
           onChangeText={handleTextChange}
           value={text}
         />
-      </View>
-    </SafeAreaView>
-    // </KeyboardAvoidingView>
+      </ScrollView>
+    </KeyboardAvoidingView>
+    //
   );
 }
 

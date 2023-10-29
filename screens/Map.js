@@ -16,6 +16,7 @@ import MapView, {Marker, Circle} from 'react-native-maps';
 // Import React Native Geolocation
 import Geolocation from '@react-native-community/geolocation';
 import {getDistance} from 'geolib';
+import {locations} from '../data/locations';
 
 // Import Locations Data
 // import {locations} from '../data/locations';
@@ -158,12 +159,12 @@ export default function Map({setNearbyLocation}) {
   if (mapState.locationPermission) {
     Geolocation.watchPosition(
       position => {
-        console.log(position);
         const userLocation = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         };
         const nearbyLocation = calculateDistance(userLocation);
+        // console.log(nearbyLocation);
         setNearbyLocation(nearbyLocation);
         setMapState({
           ...mapState,
@@ -186,7 +187,8 @@ export default function Map({setNearbyLocation}) {
 
   useEffect(() => {
     fetchData();
-  }, []); //this might cause bugs
+    console.log(mapState);
+  }, [locations]); //this might cause bugs
 
   return (
     <>

@@ -1,5 +1,5 @@
 import {Appearance, Dimensions, StyleSheet} from 'react-native';
-const mode = 'dark'; //Appearance.getColorScheme();
+const mode = Appearance.getColorScheme();
 import colors from './theme';
 
 const {height} = Dimensions.get('window');
@@ -62,9 +62,18 @@ export default StyleSheet.create({
     padding: 20,
     backgroundColor: colors[mode].bgColor,
     flex: 1,
+    paddingBottom: 50,
+  },
+  inputEmpty: {
+    marginTop: height / 4.0,
+    backgroundColor: colors[mode].fgColorLighter,
+    color: colors[mode].fgColor,
+    borderRadius: 5,
+    textAlign: 'center',
+    height: 40,
   },
   input: {
-    marginTop: 20,
+    marginTop: 50,
     backgroundColor: colors[mode].fgColorLighter,
     color: colors[mode].fgColor,
     borderRadius: 5,
@@ -81,6 +90,7 @@ export default StyleSheet.create({
   photoFullImage: {
     width: '100%',
     borderRadius: 10,
+    height: height / 1.625,
   },
   addPhoto: {
     backgroundColor: colors[mode].fgColor,
@@ -102,6 +112,6 @@ export default StyleSheet.create({
     textAlign: 'center',
     width: '50%',
     marginLeft: '25%',
-    marginTop: -(height / 12),
+    marginTop: -(height / 9),
   },
 });

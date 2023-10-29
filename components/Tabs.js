@@ -2,10 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {View, Image, Text} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import Map from '../screens/Map';
 import ProfilePage from '../screens/ProfilePage';
 import NearMePage from '../screens/NearMePage';
+import PlayMusicPage from '../screens/PlayMusicPage';
 
 import colors from '../data/theme';
 import icons from '../data/icons';
@@ -34,7 +36,9 @@ function TabIcon({focused, icon}) {
 
 const Tab = createBottomTabNavigator();
 
-function tabOptions(icon, labelValue) {
+const Stack = createStackNavigator();
+
+function tabOptions(icon, labelValue, labelStyle, newWidth) {
   return {
     tabBarIcon: ({focused}) => <TabIcon focused={focused} icon={icon} />,
     // tabBarActiveTintColor: colors.white,
@@ -42,10 +46,14 @@ function tabOptions(icon, labelValue) {
     tabBarActiveBackgroundColor: colors.blackColorTranslucentLess,
     tabBarStyle: {
       height: 70,
-      //   padding: styles.nearbyAndPlayContainer,
-      //   backgroundColor: colors.darkGreen,
+      paddingHorizontal: 20,
     },
+    tabBarLabelStyle: labelStyle,
     tabBarLabel: labelValue,
+    tabBarItemStyle: {
+      paddingTop: 10,
+      paddingHorizontal: newWidth,
+    },
     tabBarBackground: () => (
       <LinearGradient
         colors={[colors.purpleColorLighter, colors.blueColorDarker]}
@@ -58,37 +66,82 @@ function tabOptions(icon, labelValue) {
 }
 
 function Tabs({navigation}) {
-  const [nearbyLocation, setNearbyLocation] = useState();
+  const [nearbyLocation, setNearbyLocation] = useState({});
+  const [conditionalLabel, setConditionalLabel] = useState('');
   const [photoState, setPhotoState] = useState({});
   const [text, setText] = useState('');
+  // console.log(nearbyLocation);
 
-  const displayNearbylabel =
-    nearbyLocation !== null ? "There's Music Nearby" : '';
-  //   useEffect(() => {
-  //     console.log("from tabs")
-  //     console.log(nearbySamples);
-  //   }, [nearbySamples]);
+  useEffect(() => {
+    if (
+      nearbyLocation &&
+      nearbyLocation.distance &&
+      nearbyLocation.distance.nearby !== undefined
+    ) {
+      // console.log(nearbyLocation.distance.nearby);
+      const isNearbyLocationEmpty = nearbyLocation.distance.nearby === true;
+      const displayNearbylabel = isNearbyLocationEmpty
+        ? "There's Music Nearby"
+        : '';
+      setConditionalLabel(displayNearbylabel);
+    }
+  }, [nearbyLocation]);
+
+  const NearMeStack = () => {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <Stack.Screen
+          name="NearMe"
+          children={() => (
+            <NearMePage
+              navigation={navigation}
+              nearbyLocation={nearbyLocation}
+              text={text}
+              setText={setText}
+              photoState={photoState}
+            />
+          )}
+        />
+        <Stack.Screen
+          name="PlayMusic"
+          children={props => <PlayMusicPage {...props} />}
+        />
+        {/* Add more screens for the 'NearMe' tab as needed */}
+      </Stack.Navigator>
+    );
+  };
+
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
       <Tab.Screen
         name="Map"
         children={() => (
           <Map navigation={navigation} setNearbyLocation={setNearbyLocation} />
         )}
-        options={() => tabOptions(icons.tabMapWhite, '')}
+        options={() => tabOptions(icons.tabMapWhite, '', {}, 20)}
       />
       <Tab.Screen
-        name="NearMe"
-        children={() => (
-          <NearMePage
-            navigation={navigation}
-            nearbyLocation={nearbyLocation}
-            text={text}
-            setText={setText}
-            photoState={photoState}
-          />
-        )}
-        options={() => tabOptions(icons.logoWhitepurple, displayNearbylabel)}
+        name="NearMeStack"
+        children={NearMeStack}
+        options={() =>
+          tabOptions(
+            icons.logoWhitepurple,
+            conditionalLabel,
+            {
+              marginBottom: 10,
+              fontSize: 15,
+              width: 200,
+              color: colors.whiteColor,
+            },
+            50,
+          )
+        }
       />
       <Tab.Screen
         name="Profile"
@@ -101,7 +154,7 @@ function Tabs({navigation}) {
             photoState={photoState}
           />
         )}
-        options={() => tabOptions(icons.tabProfileWhite, '')}
+        options={() => tabOptions(icons.tabProfileWhite, '', {}, 20)}
       />
     </Tab.Navigator>
   );

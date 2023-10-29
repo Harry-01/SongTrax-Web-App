@@ -8,17 +8,20 @@ export const colors = {
   blackColorTranslucentMore: 'rgba(0,0,0,0.7)',
   whiteColor: '#ffffff',
   whiteColorTranslucent: 'rgba(255,255,255, 0.5)',
+  borderColor: '#CCCCCC',
   light: {
     bgColor: '#ffffff',
     fgColor: '#800080',
     fgColorLighter: 'rgba(128,0,128,0.5)',
     headerTextColor: '#ffffff',
+    fontColor: '#757575',
   },
   dark: {
     bgColor: '#422142',
     fgColor: '#f0c4f0',
     fgColorLighter: 'rgba(210,169,210,0.5)',
     headerTextColor: '#f0c4f0',
+    fontColor: '#C7BDC7',
   },
 };
 
@@ -51,8 +54,6 @@ export const colors = {
 //     body4: { color: colors.black, fontFamily: "System", fontSize: sizes.body4, lineHeight: 22 },
 //     body5: { color: colors.black, fontFamily: "System", fontSize: sizes.body5, lineHeight: 22 },
 // };
-
-
 
 // const appTheme = {colors, styles};
 export default colors;

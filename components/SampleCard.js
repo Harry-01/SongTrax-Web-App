@@ -4,7 +4,7 @@ import {baseURL, APIKEY} from '../utils';
 import colors from '../data/theme';
 import styles from '../data/styles';
 import {Rating} from 'react-native-elements';
-//Appearance.getColorScheme();
+const mode = Appearance.getColorScheme();
 
 function SampleCard({
   sample,
@@ -15,22 +15,21 @@ function SampleCard({
   setText,
 }) {
   const [sampleData, setSampleData] = useState({});
-  const [rating, setRating] = useState({});
-  const mode = 'dark';
-  const theme = mode === 'dark' ? colors.light : colors.dark;
-  let onPress = () =>
+  const [avgRating, setAvgRating] = useState(0);
+  let onPress = () => {
+    navigation.removeListener;
     navigation.navigate('PlayMusic', {
       sampleData: sampleData,
-      rating: rating,
       locationName: locationName,
       photoState: photoState,
       text: text,
       setText: setText,
     });
+  };
 
   useEffect(() => {
     getSampleById(sample.sample_id);
-    getRatingById(sample.sample_id);
+    calculateAverageRating(sample.sample_id);
   }, [sample]);
 
   async function getSampleById(sampleId) {
@@ -43,8 +42,17 @@ function SampleCard({
     const url = `${baseURL}samplerating/?api_key=${APIKEY}&sample_id=${sampleId}`;
     const response = await fetch(url);
     const json = await response.json();
-    console.log(json);
-    setRating(json);
+    // setRating(json);
+    // console.log(json);
+    return json;
+  }
+
+  async function calculateAverageRating(sampleId) {
+    const ratingData = await getRatingById(sampleId);
+    const ratings = ratingData.map(item => item.rating);
+    const ratingSum = ratings.reduce((a, b) => a + b, 0);
+    const ratingAvg = ratingSum / ratings.length || 0;
+    setAvgRating(ratingAvg);
   }
 
   function formatDateTime(isoDateTime) {
@@ -58,23 +66,42 @@ function SampleCard({
 
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={{borderBottomWidth: 1, borderBottomColor: theme.bgColor}}>
-        <Text style={{marginBottom: 5, color: theme.bgColor}}>
+      <View
+        style={{borderBottomWidth: 1, borderBottomColor: colors.borderColor}}>
+        <Text
+          style={{
+            marginBottom: 5,
+            color: colors[mode].fontColor,
+          }}>
           {sampleData.name}
         </Text>
-        <Text style={{color: theme.bgColor}}>
+        <Text style={{color: colors[mode].fontColor}}>
           {formatDateTime(sampleData.datetime)}
         </Text>
-        <Rating
-          type="star"
-          startingValue={4}
-          readonly
-          imageSize={30}
-          //   onFinishRating={ratingCompleted}
-          style={{
-            paddingVertical: 10,
-          }}
-        />
+        {mode === 'dark' ? (
+          <Rating
+            type="star"
+            startingValue={avgRating}
+            readonly
+            tintColor={colors.dark.bgColor}
+            imageSize={30}
+            //   onFinishRating={ratingCompleted}
+            style={{
+              paddingVertical: 10,
+            }}
+          />
+        ) : (
+          <Rating
+            type="star"
+            startingValue={avgRating}
+            readonly
+            imageSize={30}
+            //   onFinishRating={ratingCompleted}
+            style={{
+              paddingVertical: 10,
+            }}
+          />
+        )}
       </View>
     </TouchableOpacity>
   );

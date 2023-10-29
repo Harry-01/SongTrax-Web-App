@@ -1,30 +1,35 @@
 import React, {useRef, useState} from 'react';
 import {
+  Appearance,
   Button,
+  Dimensions,
   Image,
   SafeAreaView,
   Text,
   TextInput,
   View,
-  Dimensions,
 } from 'react-native';
-import {Rating} from 'react-native-elements';
+
 import {WebView} from 'react-native-webview';
-import {iconPinLightPurple} from '../data/icons';
+import CustomRating from '../components/CustomRating';
+import Header from '../components/Header';
+import icon from '../data/icons';
 import styles from '../data/styles';
 import colors from '../data/theme';
-import {iconSmileyLightpurple} from '../data/icons';
+const mode = Appearance.getColorScheme();
 
 const {width, height} = Dimensions.get('window');
 
 function PlayMusicPage({route}) {
-  const {sampleData, rating, locationName, text, setText, photoState} =
-    route.params;
+  const {sampleData, locationName, text, setText, photoState} = route.params;
   const [previewing, setPreviewing] = useState(false);
   const [webViewState, setWebViewState] = useState({
     loaded: false,
     actioned: false,
   });
+  const initialTextState = {
+    
+  }
   const [currentInput, setCurrentInput] = useState(text);
   const webViewRef = useRef();
 
@@ -35,20 +40,11 @@ function PlayMusicPage({route}) {
     });
   }
 
-  function handleReloadPress() {
-    webViewRef.current.reload();
-  }
-
   function handleActionPress() {
     if (!webViewState.actioned) {
-      setPreviewing(true);
-      const songData = JSON.parse(sampleData.recording_data);
-      console.log(typeof songData);
-      console.log(webViewState);
-      webViewRef.current.injectJavaScript(
-        `preparePreview(${songData}, ${sampleData.type})`,
-      );
-      webViewRef.current.injectJavaScript('playPreview()');
+      const playSong = `preparePreview(${sampleData.recording_data}, '${sampleData.type}'); playPreview();`;
+      webViewRef.current.injectJavaScript(playSong);
+      // webViewRef.current.injectJavaScript('playSong()');
     } else {
       webViewRef.current.injectJavaScript('stopSong()');
     }
@@ -56,10 +52,13 @@ function PlayMusicPage({route}) {
       ...webViewState,
       actioned: !webViewState.actioned,
     });
-  }
 
-  function playBackSample() {
-    console.log(sampleData);
+    setTimeout(() => {
+      setWebViewState({
+        ...webViewState,
+        actioned: false,
+      });
+    }, 4000);
   }
 
   const handleInput = newText => {
@@ -69,7 +68,7 @@ function PlayMusicPage({route}) {
 
   const localStyles = {
     userRow: {
-      marginVertical: 20,
+      marginVertical: 10,
       flexDirection: 'row',
       justifyContent: 'left',
       gap: 10,
@@ -77,7 +76,7 @@ function PlayMusicPage({route}) {
     },
     profileImage: {
       borderRadius: 100, // A large value to create a circle
-      borderColor: colors.purpleColorLighter,
+      borderColor: colors[mode].fgColor,
       borderWidth: 3, // You can adjust the border width as needed
       justifyContent: 'center',
       alignItems: 'center',
@@ -89,17 +88,7 @@ function PlayMusicPage({route}) {
   return (
     <SafeAreaView style={styles.nearbyAndPlayContainer}>
       <View style={{padding: 10}}>
-        <View style={styles.location}>
-          <Image
-            style={styles.locationIcon}
-            source={{
-              uri: iconPinLightPurple,
-              width: 50,
-              height: 50,
-            }}
-          />
-          <Text style={styles.locationHeading}>{locationName}</Text>
-        </View>
+        <Header locationName={locationName} />
         <Text style={[styles.songName, {paddingBottom: 20}]}>
           {sampleData.name}
         </Text>
@@ -115,52 +104,52 @@ function PlayMusicPage({route}) {
         />
         {webViewState.loaded && (
           <View style={styles.playButton}>
-            {/* <Button onPress={handleReloadPress} title="Reload WebView" /> */}
             <Button
               onPress={handleActionPress}
               title={!webViewState.actioned ? 'Play Music' : 'Stop Playback'}
+              color={colors[mode].bgColor}
             />
           </View>
         )}
-        <Rating
-          type="star"
-          fraction={0}
-          startingValue={rating}
-          readonly={false}
-          imageSize={40}
-          //   onFinishRating={ratingCompleted}
-          style={styles.ratingComponent}
+        <CustomRating
+          sampleId={sampleData.id}
+          sampleDate={sampleData.datetime}
         />
       </View>
       <View>
         <Text style={styles.songName}>Currently At This Location:</Text>
         <View style={localStyles.userRow}>
           <Image
-            style={localStyles.profileImage}
+            style={[localStyles.profileImage, {width: 70, height: 70}]}
             resizeMode="cover"
-            source={{
-              uri: photoState.uri,
-              width: 70,
-              height: 70,
-            }}
+            source={
+              photoState.uri
+                ? {
+                    uri: photoState.uri,
+                  }
+                : mode === 'dark'
+                ? icon.iconSmileyLightpurple
+                : icon.iconSmileyDarkpurple
+            }
           />
           <TextInput
             placeholder={text}
+            style={{color: colors[mode].fgColor}}
             onChangeText={handleInput}
             value={currentInput}
           />
         </View>
-        <View style={localStyles.userRow}>
+        <View style={[localStyles.userRow]}>
           <Image
-            style={localStyles.profileImage}
+            style={[localStyles.profileImage, {width: 70, height: 70}]}
             resizeMode="cover"
-            source={{
-              uri: iconSmileyLightpurple,
-              width: 70,
-              height: 70,
-            }}
+            source={
+              mode === 'dark'
+                ? icon.iconSmileyLightpurple
+                : icon.iconSmileyDarkpurple
+            }
           />
-          <Text>Add other...</Text>
+          <Text style={{color: colors[mode].fgColor}}>And others...</Text>
         </View>
       </View>
     </SafeAreaView>
