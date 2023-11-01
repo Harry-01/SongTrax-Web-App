@@ -1,40 +1,40 @@
-import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View, FlatList, Text, Image} from 'react-native';
-
-import icons from '../data/icons';
-
-import colors from '../data/theme';
-import styles from '../data/styles';
-import {iconPinLightPurple} from '../data/icons';
+import React from 'react';
+import {FlatList, SafeAreaView} from 'react-native';
+import NearbyAndPlayHeader from '../components/NearbyAndPlayHeader';
+import NoSamples from '../components/NoSamples';
 import SampleCard from '../components/SampleCard';
-import {baseURL, APIKEY} from '../utils';
-import Header from '../components/Header';
+import styles from '../data/styles';
 
-function NearMePage({navigation, nearbyLocation, text, setText, photoState}) {
-  const [nearbySamples, setNearbySamples] = useState([]);
-
-  useEffect(() => {
-    if (nearbyLocation !== undefined && nearbyLocation.id !== undefined) {
-      getSamplesByLocation(nearbyLocation.id);
-    }
-  }, [nearbyLocation]);
-
-  async function getSamplesByLocation(locationId) {
-    const url = `${baseURL}sampletolocation/?api_key=${APIKEY}&location_id=${locationId}`;
-    const response = await fetch(url);
-    const json = await response.json();
-    setNearbySamples(json);
-  }
-
+/**
+ * Represents a page displaying nearby samples or a message if no samples are available.
+ *
+ * @param {object} props - The component's properties.
+ * @param {object} props.navigation - Navigation object for controlling navigation.
+ * @param {object} props.nearbyLocation - Details of the nearby location.
+ * @param {string} props.text - Text input state.
+ * @param {function} props.setText - Function to set the text input state.
+ * @param {object} props.photoState - The state of the photo.
+ * @param {array} props.nearbySamples - List of nearby samples.
+ *
+ * @returns {JSX.Element} - A page displaying nearby samples or a message if no samples are available.
+ */
+function NearMePage({
+  navigation,
+  nearbyLocation,
+  text,
+  setText,
+  photoState,
+  nearbySamples,
+}) {
   const locationName =
-    nearbyLocation && nearbyLocation.name
+    nearbyLocation?.distance?.nearby === true
       ? nearbyLocation.name
-      : 'No Location Name';
-  console.log(nearbyLocation);
+      : 'No Nearby Location';
+
   return (
     <SafeAreaView style={styles.nearbyAndPlayContainer}>
-      <Header locationName={locationName} />
-      {Object.keys(nearbyLocation).length > 0 ? (
+      <NearbyAndPlayHeader locationName={locationName} />
+      {nearbySamples?.length > 0 ? (
         <FlatList
           data={nearbySamples}
           keyExtractor={item => item.id}
@@ -44,19 +44,16 @@ function NearMePage({navigation, nearbyLocation, text, setText, photoState}) {
                 sample={item}
                 navigation={navigation}
                 locationName={locationName}
-                text={text ? text : 'Enter your name'}
+                text={text}
                 setText={setText}
                 photoState={photoState}
               />
             );
           }}
-          style={{
-            padding: 10,
-          }}></FlatList>
+          style={styles.screenPadding}
+        />
       ) : (
-        <View>
-          <Text>Hello</Text>
-        </View>
+        <NoSamples />
       )}
     </SafeAreaView>
   );

@@ -1,18 +1,20 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import React from 'react';
+import {SafeAreaView} from 'react-native';
 
-import Tabs from './components/Tabs';
+import Tabs from './components/nav/Tabs';
 
 import styles from './data/styles';
-// import initialRecipes from "./data/recipes";
 
 const Stack = createStackNavigator();
 
+/**
+ * The main application component that configures the navigation stack.
+ *
+ * @returns {JSX.Element} - The main application component containing the navigation stack.
+ */
 function App() {
-  const [nearbySamples, setNearbySamples] = useState([]);
-
   return (
     <SafeAreaView style={styles.nearbyAndPlayContainer}>
       <NavigationContainer>
@@ -21,16 +23,7 @@ function App() {
             headerShown: false,
           }}
           initialRouteName={'Tabs'}>
-          {/* <Stack.Screen
-            name="PlayMusic"
-            children={props => <PlayMusicPage {...props} />}
-          /> */}
           <Stack.Screen name="Tabs" children={props => <Tabs {...props} />} />
-
-          {/* <Stack.Screen
-            name="NearMe"
-            children={props => <NearMePage {...props} />}
-          /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

@@ -1,97 +1,92 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  Appearance,
   Button,
-  Dimensions,
-  Image,
+  KeyboardAvoidingView,
+  LogBox,
   SafeAreaView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
-
 import {WebView} from 'react-native-webview';
 import CustomRating from '../components/CustomRating';
-import Header from '../components/Header';
-import icon from '../data/icons';
+import NearbyAndPlayHeader from '../components/NearbyAndPlayHeader';
+import CurrentUsers from '../components/play-music/CurrentUsers';
 import styles from '../data/styles';
 import colors from '../data/theme';
-const mode = Appearance.getColorScheme();
+import {mode} from '../utils';
 
-const {width, height} = Dimensions.get('window');
-
+/**
+ * Represents a page for playing music and providing user ratings for a sample.
+ *
+ * @param {object} route - Route parameters for the page.
+ * @param {object} route.params - Parameters passed to the page.
+ * @param {object} route.params.sampleData - Details of the sample to play music for.
+ * @param {string} route.params.locationName - Name of the location.
+ * @param {string} route.params.text - Text input for user interactions.
+ * @param {function} route.params.setText - Function to set the text input.
+ * @param {object} route.params.photoState - The state of the photo.
+ * @param {boolean} route.params.hasRated - Indicates if the user has submitted a rating.
+ * @param {function} route.params.setHasRated - Function to set the 'hasRated' state.
+ *
+ * @returns {JSX.Element} - A page for playing music and providing ratings for a sample.
+ */
 function PlayMusicPage({route}) {
-  const {sampleData, locationName, text, setText, photoState} = route.params;
-  const [previewing, setPreviewing] = useState(false);
-  const [webViewState, setWebViewState] = useState({
-    loaded: false,
-    actioned: false,
-  });
-  const initialTextState = {
-    
-  }
-  const [currentInput, setCurrentInput] = useState(text);
+  const {
+    sampleData,
+    locationName,
+    text,
+    setText,
+    photoState,
+    hasRated,
+    setHasRated,
+  } = route.params;
+  const [loaded, setLoaded] = useState(false);
+  const [actioned, setActioned] = useState(false);
   const webViewRef = useRef();
 
-  function webViewLoaded() {
-    setWebViewState({
-      ...webViewState,
-      loaded: true,
-    });
-  }
+  /**
+   * Watches for the WebView load completion and updates the state accordingly.
+   */
+  const webViewLoaded = () => {
+    setLoaded(true);
+  };
 
-  function handleActionPress() {
-    if (!webViewState.actioned) {
+  LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+  ]);
+
+  /**
+   * Handles the action button press to play or stop the music playback.
+   */
+  const handleActionPress = () => {
+    if (!actioned) {
       const playSong = `preparePreview(${sampleData.recording_data}, '${sampleData.type}'); playPreview();`;
       webViewRef.current.injectJavaScript(playSong);
-      // webViewRef.current.injectJavaScript('playSong()');
     } else {
       webViewRef.current.injectJavaScript('stopSong()');
     }
-    setWebViewState({
-      ...webViewState,
-      actioned: !webViewState.actioned,
-    });
 
-    setTimeout(() => {
-      setWebViewState({
-        ...webViewState,
-        actioned: false,
-      });
+    setActioned(!actioned);
+  };
+
+  /**
+   * Resets the action state after a delay to prevent continuous play/stop actions.
+   */
+  useEffect(() => {
+    const resetActioned = setTimeout(() => {
+      setActioned(false);
     }, 4000);
-  }
 
-  const handleInput = newText => {
-    setText(newText);
-    setCurrentInput(newText);
-  };
-
-  const localStyles = {
-    userRow: {
-      marginVertical: 10,
-      flexDirection: 'row',
-      justifyContent: 'left',
-      gap: 10,
-      alignItems: 'center',
-    },
-    profileImage: {
-      borderRadius: 100, // A large value to create a circle
-      borderColor: colors[mode].fgColor,
-      borderWidth: 3, // You can adjust the border width as needed
-      justifyContent: 'center',
-      alignItems: 'center',
-      overflow: 'hidden',
-      marginHorizontal: 10,
-    },
-  };
+    return () => clearTimeout(resetActioned);
+  }, [actioned]);
 
   return (
-    <SafeAreaView style={styles.nearbyAndPlayContainer}>
-      <View style={{padding: 10}}>
-        <Header locationName={locationName} />
-        <Text style={[styles.songName, {paddingBottom: 20}]}>
-          {sampleData.name}
-        </Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.nearbyAndPlayContainer}>
+      <SafeAreaView style={styles.screenPadding}>
+        <NearbyAndPlayHeader locationName={locationName} />
+        <Text style={styles.playMusicSongName}>{sampleData.name}</Text>
         <WebView
           ref={ref => (webViewRef.current = ref)}
           originWhitelist={['*']}
@@ -102,11 +97,11 @@ function PlayMusicPage({route}) {
           onLoad={webViewLoaded}
           style={styles.webView}
         />
-        {webViewState.loaded && (
+        {loaded && (
           <View style={styles.playButton}>
             <Button
               onPress={handleActionPress}
-              title={!webViewState.actioned ? 'Play Music' : 'Stop Playback'}
+              title={!actioned ? 'Play Music' : 'Stop Playback'}
               color={colors[mode].bgColor}
             />
           </View>
@@ -114,45 +109,12 @@ function PlayMusicPage({route}) {
         <CustomRating
           sampleId={sampleData.id}
           sampleDate={sampleData.datetime}
+          hasRated={hasRated}
+          setHasRated={setHasRated}
         />
-      </View>
-      <View>
-        <Text style={styles.songName}>Currently At This Location:</Text>
-        <View style={localStyles.userRow}>
-          <Image
-            style={[localStyles.profileImage, {width: 70, height: 70}]}
-            resizeMode="cover"
-            source={
-              photoState.uri
-                ? {
-                    uri: photoState.uri,
-                  }
-                : mode === 'dark'
-                ? icon.iconSmileyLightpurple
-                : icon.iconSmileyDarkpurple
-            }
-          />
-          <TextInput
-            placeholder={text}
-            style={{color: colors[mode].fgColor}}
-            onChangeText={handleInput}
-            value={currentInput}
-          />
-        </View>
-        <View style={[localStyles.userRow]}>
-          <Image
-            style={[localStyles.profileImage, {width: 70, height: 70}]}
-            resizeMode="cover"
-            source={
-              mode === 'dark'
-                ? icon.iconSmileyLightpurple
-                : icon.iconSmileyDarkpurple
-            }
-          />
-          <Text style={{color: colors[mode].fgColor}}>And others...</Text>
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+      <CurrentUsers photoState={photoState} setText={setText} text={text} />
+    </KeyboardAvoidingView>
   );
 }
 

@@ -1,5 +1,3 @@
-// Colours
-
 export const colors = {
   purpleColorLighter: '#A42DE8',
   blueColorLighter: '#318AFF',
@@ -25,35 +23,4 @@ export const colors = {
   },
 };
 
-// Sizes
-
-// export const sizes = {
-//     // Global sizes
-//     base: 8,
-//     font: 14,
-//     radius: 12,
-//     padding: 24,
-//     headerHeight: 300,
-
-//     // Font sizes
-//     heading: 22,
-//     body1: 30,
-//     body2: 22,
-//     body3: 16,
-//     body4: 14,
-//     body5: 12,
-// };
-
-// // Fonts
-
-// export const fonts = {
-//     heading: { paddingBottom: sizes.padding / 2, color: colors.black, fontFamily: "System", fontSize: sizes.heading, lineHeight: 30 },
-//     body1: { color: colors.black, fontFamily: "System", fontSize: sizes.body1, lineHeight: 36 },
-//     body2: { color: colors.black, fontFamily: "System", fontSize: sizes.body2, lineHeight: 30 },
-//     body3: { color: colors.black, fontFamily: "System", fontSize: sizes.body3, lineHeight: 22 },
-//     body4: { color: colors.black, fontFamily: "System", fontSize: sizes.body4, lineHeight: 22 },
-//     body5: { color: colors.black, fontFamily: "System", fontSize: sizes.body5, lineHeight: 22 },
-// };
-
-// const appTheme = {colors, styles};
 export default colors;

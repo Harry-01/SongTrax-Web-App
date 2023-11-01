@@ -1,15 +1,31 @@
 import React, {useState} from 'react';
-import {Text, View, Image, Appearance} from 'react-native';
-import icons from '../data/icons';
 import {Rating} from 'react-native-elements';
-import colors from '../data/theme';
 import styles from '../data/styles';
-import {APIKEY, baseURL} from '../utils';
-const mode = Appearance.getColorScheme();
+import colors from '../data/theme';
+import {APIKEY, baseURL, mode} from '../utils';
 
-function CustomRating({sampleId, sampleDate}) {
-  const [hasRated, setHasRated] = useState(false);
+/**
+ * Represents a star rating component with functionality to submit user ratings.
+ *
+ * @param {object} props - The component's properties.
+ * @param {number} props.sampleId - The ID of the sample.
+ * @param {string} props.sampleDate - The date of the sample.
+ * @param {boolean} props.hasRated - Indicates if the user has submitted a
+ *                                   rating.
+ * @param {function} props.setHasRated - Function to set the 'hasRated' state.
+ *
+ * @returns {JSX.Element} - A Rating component for user ratings.
+ */
+function CustomRating({sampleId, sampleDate, hasRated, setHasRated}) {
+  const [hasRatedLocal, setHasRatedLocal] = useState(false);
 
+  /**
+   * Posts a user rating to the API.
+   *
+   * @param {number} newRating - The user's new rating to be posted.
+   *
+   * @returns {Promise<object>} - A promise containing the API response.
+   */
   async function postRating(newRating) {
     const url = `${baseURL}samplerating/?api_key=${APIKEY}`;
 
@@ -32,39 +48,32 @@ function CustomRating({sampleId, sampleDate}) {
     return json;
   }
 
+  /**
+   * Handles the completion of a user rating.
+   *
+   * @param {number} rating - The user's rating.
+   */
   async function ratingCompleted(rating) {
-    if (hasRated === false) {
-      const response = await postRating(rating);
-      // console.log(response);
+    if (!hasRated) {
+      await postRating(rating);
       setHasRated(true);
+      setHasRatedLocal(true);
     }
   }
 
+  const tintColor = mode === 'dark' ? colors.dark.bgColor : null;
+
   return (
-    <View>
-      {mode === 'dark' ? (
-        <Rating
-          type="star"
-          fraction={0}
-          startingValue={0}
-          readonly={hasRated}
-          imageSize={40}
-          tintColor={colors.dark.bgColor}
-          onFinishRating={rating => ratingCompleted(rating)}
-          style={styles.ratingComponent}
-        />
-      ) : (
-        <Rating
-          type="star"
-          fraction={0}
-          startingValue={0}
-          readonly={hasRated}
-          imageSize={40}
-          onFinishRating={rating => ratingCompleted(rating)}
-          style={styles.ratingComponent}
-        />
-      )}
-    </View>
+    <Rating
+      type="star"
+      fraction={0}
+      startingValue={0}
+      readonly={hasRatedLocal}
+      imageSize={40}
+      tintColor={tintColor}
+      onFinishRating={rating => ratingCompleted(rating)}
+      style={styles.ratingComponent}
+    />
   );
 }
 

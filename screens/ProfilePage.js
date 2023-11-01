@@ -1,90 +1,51 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Button,
-  Dimensions,
-  Image,
-  TextInput,
   KeyboardAvoidingView,
-  ScrollView,
   Platform,
-  Appearance,
+  SafeAreaView,
+  ScrollView,
+  View,
 } from 'react-native';
-import colors from '../data/theme';
-import {launchImageLibrary} from 'react-native-image-picker';
-
-const {width, height} = Dimensions.get('window');
+import EditButton from '../components/profile/EditButton';
+import Photo from '../components/profile/Photo';
+import ProfileHeader from '../components/profile/ProfileHeader';
+import ProfileTextInput from '../components/profile/ProfileTextInput';
 import styles from '../data/styles';
-const mode = Appearance.getColorScheme();
 
+/**
+ * Represents a page for the user's profile with editable information and photo.
+ *
+ * @param {object} props - The component's properties.
+ * @param {function} props.setText - Function to set the user's profile text.
+ * @param {string} props.text - The user's profile text.
+ * @param {function} props.setPhotoState - Function to set the user's profile photo state.
+ * @param {object} props.photoState - The state of the user's profile photo.
+ * 
+ * @returns {JSX.Element} - A page for the user's profile with editable information and photo.
+ */
 function ProfilePage({setText, text, setPhotoState, photoState}) {
-  const handleTextChange = text => {
-    setText(text);
-    // console.log(photoState);
-  };
-
-  async function handleChangePress() {
-    const result = await launchImageLibrary();
-    //console.log(result);
-    if (typeof result.assets[0] == 'object') {
-      setPhotoState(result.assets[0]);
-    }
-  }
-
   const hasPhoto = typeof photoState.uri != 'undefined';
-
-  const buttonStyle = hasPhoto ? styles.changePhoto : styles.addPhoto;
-  const inputStyle = hasPhoto ? styles.input : styles.inputEmpty;
-  function Photo(props) {
-    if (hasPhoto) {
-      return (
-        <View style={styles.photoFullView}>
-          <Image
-            style={styles.photoFullImage}
-            resizeMode="cover"
-            source={{
-              uri: photoState.uri,
-              width: width,
-              height: height / 2,
-            }}
-          />
-        </View>
-      );
-    } else {
-      return <View style={styles.photoEmptyView} />;
-    }
-  }
   const keyboardVerticalOffset = Platform.OS === 'ios' ? 100 : 0;
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={keyboardVerticalOffset}
       style={styles.profileContainer}>
-      <ScrollView>
-        <View>
-          <Text style={styles.heading}>Edit Profile</Text>
-          <Text style={styles.subHeading}>Mirror, Mirror On The Wall...</Text>
-        </View>
-        <View>
-          <Photo />
-          <View style={buttonStyle}>
-            <Button
-              onPress={handleChangePress}
-              color={colors[mode].bgColor}
-              title={hasPhoto ? 'Change Photo' : 'Add Photo'}
-            />
+      <SafeAreaView>
+        <ScrollView>
+          <ProfileHeader />
+          <View>
+            <Photo hasPhoto={hasPhoto} photoState={photoState} />
+            <EditButton hasPhoto={hasPhoto} setPhotoState={setPhotoState} />
           </View>
-        </View>
-
-        <TextInput
-          style={inputStyle}
-          onChangeText={handleTextChange}
-          value={text}
-        />
-      </ScrollView>
+          <ProfileTextInput
+            hasPhoto={hasPhoto}
+            setText={setText}
+            value={text}
+          />
+        </ScrollView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
     //
   );
