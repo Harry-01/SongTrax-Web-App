@@ -1,6 +1,6 @@
 import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
-import colors from '../data/theme';
+import colors from '../data/colors';
 import TabIcon from '../components/nav/TabIcon';
 import TabLabel from '../components/nav/TabLabel';
 import styles from '../data/styles';
@@ -20,14 +20,12 @@ function tabOptions(icon, labelValue, labelStyle, newWidth) {
     tabBarIcon: ({focused}) => (
       <TabIcon focused={focused} icon={icon} labelValue={labelValue} />
     ),
-    // tabBarActiveTintColor: colors.white,
     tabBarInactiveTintColor: colors.darkPurple,
     tabBarActiveBackgroundColor: colors.blackColorTranslucentLess,
     tabBarStyle: {
       height: 70,
       paddingHorizontal: 20,
     },
-    // tabBarLabelStyle: labelStyle,
     tabBarLabel:
       labelValue === ''
         ? ''

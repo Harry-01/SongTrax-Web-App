@@ -1,19 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  Button,
-  KeyboardAvoidingView,
-  LogBox,
-  SafeAreaView,
-  Text,
-  View,
-} from 'react-native';
-import {WebView} from 'react-native-webview';
-import CustomRating from '../components/CustomRating';
+import React from 'react';
+import {KeyboardAvoidingView, LogBox, SafeAreaView, Text} from 'react-native';
+import CustomRating from '../components/play-music/CustomRating';
 import NearbyAndPlayHeader from '../components/NearbyAndPlayHeader';
 import CurrentUsers from '../components/play-music/CurrentUsers';
+import PlayMusicButton from '../components/play-music/PlayMusicButton';
 import styles from '../data/styles';
-import colors from '../data/theme';
-import {mode} from '../utils';
 
 /**
  * Represents a page for playing music and providing user ratings for a sample.
@@ -40,45 +31,17 @@ function PlayMusicPage({route}) {
     hasRated,
     setHasRated,
   } = route.params;
-  const [loaded, setLoaded] = useState(false);
-  const [actioned, setActioned] = useState(false);
-  const webViewRef = useRef();
-
+  
   /**
-   * Watches for the WebView load completion and updates the state accordingly.
+   * According to React Native Docs
+   * "If you don't use state persistence or deep link to the screen which accepts functions in params,
+   * then the warning doesn't affect you and you can safely ignore it."
+   *
+   * I get this warning when I pass a callback to params but doesn't effect functionality.
    */
-  const webViewLoaded = () => {
-    setLoaded(true);
-  };
-
   LogBox.ignoreLogs([
     'Non-serializable values were found in the navigation state',
   ]);
-
-  /**
-   * Handles the action button press to play or stop the music playback.
-   */
-  const handleActionPress = () => {
-    if (!actioned) {
-      const playSong = `preparePreview(${sampleData.recording_data}, '${sampleData.type}'); playPreview();`;
-      webViewRef.current.injectJavaScript(playSong);
-    } else {
-      webViewRef.current.injectJavaScript('stopSong()');
-    }
-
-    setActioned(!actioned);
-  };
-
-  /**
-   * Resets the action state after a delay to prevent continuous play/stop actions.
-   */
-  useEffect(() => {
-    const resetActioned = setTimeout(() => {
-      setActioned(false);
-    }, 4000);
-
-    return () => clearTimeout(resetActioned);
-  }, [actioned]);
 
   return (
     <KeyboardAvoidingView
@@ -87,25 +50,7 @@ function PlayMusicPage({route}) {
       <SafeAreaView style={styles.screenPadding}>
         <NearbyAndPlayHeader locationName={locationName} />
         <Text style={styles.playMusicSongName}>{sampleData.name}</Text>
-        <WebView
-          ref={ref => (webViewRef.current = ref)}
-          originWhitelist={['*']}
-          source={{
-            uri: 'https://comp2140.uqcloud.net/static/samples/index.html',
-          }}
-          pullToRefreshEnabled={true}
-          onLoad={webViewLoaded}
-          style={styles.webView}
-        />
-        {loaded && (
-          <View style={styles.playButton}>
-            <Button
-              onPress={handleActionPress}
-              title={!actioned ? 'Play Music' : 'Stop Playback'}
-              color={colors[mode].bgColor}
-            />
-          </View>
-        )}
+        <PlayMusicButton sampleData={sampleData} />
         <CustomRating
           sampleId={sampleData.id}
           sampleDate={sampleData.datetime}

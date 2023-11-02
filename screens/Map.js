@@ -1,11 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PermissionsAndroid} from 'react-native';
-
 import {APIKEY, baseURL} from '../utils';
-// Import React Native Maps
 import MapView, {Circle} from 'react-native-maps';
-
-// Import React Native Geolocation
 import Geolocation from '@react-native-community/geolocation';
 import {getDistance} from 'geolib';
 import styles from '../data/styles';
@@ -25,9 +21,8 @@ export default function Map({setNearbyLocation}) {
     locationPermission: false,
     locations: [],
     userLocation: {
-      latitude: -27.499526188402154,
-      longitude: 152.9728129460468,
-      // Starts at "Indooroopilly Shopping Centre"
+      latitude: null,
+      longitude: null,
     },
   };
   const [mapState, setMapState] = useState(initialMapState);
@@ -66,6 +61,23 @@ export default function Map({setNearbyLocation}) {
       });
     return newLocations;
   }
+
+  /**
+   * Fetches and updates the location data.
+   */
+  async function fetchData() {
+    const locations = await updateLocations();
+    setMapState(prevMapState => ({
+      ...prevMapState,
+      locations: locations,
+    }));
+    setDataFetched(true);
+  }
+
+  // fetches data on mount
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Run location permissions check after render due to side effects
   // Only Android needs extra code to check for permissions (in addition to android/app/src/main/AndroidManifest.xml)
@@ -129,22 +141,6 @@ export default function Map({setNearbyLocation}) {
     }
     return null; // Return null or handle an empty case as required
   }
-
-  /**
-   * Fetches and updates the location data.
-   */
-  async function fetchData() {
-    const locations = await updateLocations();
-    setMapState(prevMapState => ({
-      ...prevMapState,
-      locations: locations,
-    }));
-    setDataFetched(true);
-  }
-
-  useEffect(() => {
-    fetchData();
-  }, []); //this might cause bugs
 
   /**
    * Watches the user's position and updates state based on location changes.

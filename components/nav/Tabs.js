@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import Map from '../../screens/Map';
 import ProfilePage from '../../screens/ProfilePage';
 import icons from '../../data/icons';
-import colors from '../../data/theme';
+import colors from '../../data/colors';
 import tabOptions from '../../navigation/tabOptions';
 import NearMeStack from './NearMeStack';
 import {baseURL, APIKEY} from '../../utils';
@@ -14,7 +14,7 @@ const Tab = createBottomTabNavigator();
  * Renders the navigation tabs for the app.
  * @param {object} props - Component properties.
  * @param {object} props.navigation - The navigation object.
- * 
+ *
  * @returns {JSX.Element} The navigation tabs component.
  */
 function Tabs({navigation}) {
@@ -24,8 +24,9 @@ function Tabs({navigation}) {
   const [nearbySamples, setNearbySamples] = useState([]);
   const [text, setText] = useState('');
 
+  // Adds the music nearby label in nav if location has sample
   useEffect(() => {
-    if (nearbyLocation?.distance?.nearby === true) {
+    if (nearbyLocation?.distance?.nearby) {
       const fetchSamples = async () => {
         try {
           const samples = await getSamplesByLocation(nearbyLocation.id);
@@ -51,7 +52,7 @@ function Tabs({navigation}) {
   /**
    * Fetches samples by location ID from the API.
    * @param {string} locationId - The ID of the location to fetch samples for.
-   * 
+   *
    * @returns {Promise<object[]>} A promise that resolves to an array of samples.
    */
   async function getSamplesByLocation(locationId) {

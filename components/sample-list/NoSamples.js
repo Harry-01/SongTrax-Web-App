@@ -1,8 +1,8 @@
 import React from 'react';
 import {Animated, Easing, StyleSheet, Text, View} from 'react-native';
-import icons from '../data/icons';
-import styles from '../data/styles';
-import {mode} from '../utils';
+import icons from '../../data/icons';
+import styles from '../../data/styles';
+import {mode} from '../../utils';
 
 /**
  * Component displayed when no samples are available near the user.
@@ -17,7 +17,7 @@ function NoSamples({}) {
     Animated.timing(this.spinValue, {
       toValue: 1,
       duration: 3000,
-      easing: Easing.linear, // Easing is an additional import from react-native
+      easing: Easing.linear,
       useNativeDriver: true, // To make use of native driver for performance
     }),
   ).start();
@@ -27,6 +27,7 @@ function NoSamples({}) {
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
   });
+
   const smileyIcon =
     mode === 'dark' ? icons.iconSmileyLightpurple : icons.iconSmileyDarkpurple;
 

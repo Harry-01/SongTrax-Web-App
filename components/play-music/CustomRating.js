@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Rating} from 'react-native-elements';
-import styles from '../data/styles';
-import colors from '../data/theme';
-import {APIKEY, baseURL, mode} from '../utils';
+import styles from '../../data/styles';
+import colors from '../../data/colors';
+import {APIKEY, baseURL, mode} from '../../utils';
 
 /**
  * Represents a star rating component with functionality to submit user ratings.
@@ -17,6 +17,7 @@ import {APIKEY, baseURL, mode} from '../utils';
  * @returns {JSX.Element} - A Rating component for user ratings.
  */
 function CustomRating({sampleId, sampleDate, hasRated, setHasRated}) {
+  // state that holds the hasRated locally to disable rating once rated
   const [hasRatedLocal, setHasRatedLocal] = useState(false);
 
   /**

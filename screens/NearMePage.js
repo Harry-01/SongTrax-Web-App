@@ -1,8 +1,8 @@
 import React from 'react';
 import {FlatList, SafeAreaView} from 'react-native';
 import NearbyAndPlayHeader from '../components/NearbyAndPlayHeader';
-import NoSamples from '../components/NoSamples';
-import SampleCard from '../components/SampleCard';
+import NoSamples from '../components/sample-list/NoSamples';
+import SampleCard from '../components/sample-list/SampleCard';
 import styles from '../data/styles';
 
 /**

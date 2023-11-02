@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Image, TextInput, View} from 'react-native';
 import icons from '../../data/icons';
 import styles from '../../data/styles';
-import colors from '../../data/theme';
+import colors from '../../data/colors';
 import {mode} from '../../utils';
 
 /**
@@ -11,7 +11,7 @@ import {mode} from '../../utils';
  * @param {function} props.setText - Function to set the text.
  * @param {string} props.text - The text to be set.
  * @param {object} props.photoState - State containing the photo details of the user.
- * 
+ *
  * @returns {JSX.Element} A JSX element representing the main user section.
  */
 function MainUser({setText, text, photoState}) {

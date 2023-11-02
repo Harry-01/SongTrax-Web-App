@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {Rating} from 'react-native-elements';
-import colors from '../data/theme';
-import styles from '../data/styles';
-import {APIKEY, baseURL, mode} from '../utils';
+import colors from '../../data/colors';
+import styles from '../../data/styles';
+import {APIKEY, baseURL, mode} from '../../utils';
 
 /**
  * Represents a component for displaying details of a sample card.
@@ -46,11 +46,13 @@ function SampleCard({
     });
   };
 
+  // fetches samples and calculates the avg rating
   useEffect(() => {
     getSampleById(sample.sample_id);
     calculateAverageRating(sample.sample_id);
   }, [sample, avgRating]);
 
+  // recalcuate avg rating when user submits a rating
   useEffect(() => {
     calculateAverageRating(sample.sample_id);
     setHasRated(false);

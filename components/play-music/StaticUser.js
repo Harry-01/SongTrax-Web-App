@@ -2,7 +2,7 @@ import React from 'react';
 import {Image, Text, View} from 'react-native';
 import icons from '../../data/icons';
 import styles from '../../data/styles';
-import colors from '../../data/theme';
+import colors from '../../data/colors';
 import {mode} from '../../utils';
 
 /**

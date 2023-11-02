@@ -1,6 +1,6 @@
 import {Dimensions, StyleSheet} from 'react-native';
 import {mode} from '../utils';
-import colors from './theme';
+import colors from './colors';
 
 const {height} = Dimensions.get('window');
 
@@ -22,6 +22,7 @@ export default StyleSheet.create({
     fontSize: 14,
     color: colors[mode].fgColor,
     paddingBottom: 25,
+    fontWeight: 'bold'
   },
   songName: {
     fontSize: 20,
